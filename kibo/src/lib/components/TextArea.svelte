@@ -1,15 +1,13 @@
 <script lang="ts">
-	import { replaceState } from '$app/navigation';
 	import { page } from '$app/state';
 	import { browser } from '$app/environment';
 
-	import { encode, decode } from '$lib/utils/base64';
+	import { decode } from '$lib/utils/base64';
 
 	let {
 		content = $bindable(''),
 		fileName = $bindable('untitled'),
-		cursorIndex = $bindable(0),
-		shareUrl = $bindable(page.url.href)
+		cursorIndex = $bindable(0)
 	} = $props();
 
 	// --- Initial State (SSR Safe) ---
@@ -24,30 +22,32 @@
 
 	let textareaRef: HTMLTextAreaElement | undefined = $state();
 	let lineNumbersRef: HTMLDivElement | undefined = $state();
+	let charMeasureRef: HTMLSpanElement | undefined = $state();
+
+	let containerWidth = $state(0);
+	let charWidth = $state(0);
+	const LINE_HEIGHT = 1.5; // Matches leading-6 (1.5rem = 24px)
 
 	// --- Derived Calculations ---
 	let lines = $derived(content.split('\n'));
 
-	// --- Sync Effect ---
+	// Calculate how many visual rows each logical line occupies
+	let lineMetadata = $derived.by(() => {
+		if (charWidth === 0 || containerWidth === 0) return lines.map(() => 1);
+
+		const charsPerLine = Math.floor(containerWidth / charWidth);
+
+		return lines.map((line) => {
+			if (line.length === 0) return 1;
+			return Math.ceil(line.length / charsPerLine) || 1;
+		});
+	});
+
+	// --- Sync Effects ---
 	$effect(() => {
-		if (!browser) return;
+		if (!charMeasureRef) return;
 
-		// Track dependencies
-		const currentContent = content;
-		const currentFile = fileName;
-
-		const url = new URL(page.url);
-		url.searchParams.set('f', encode(currentFile));
-		url.searchParams.set('c', encode(currentContent));
-
-		// try/catch handles the "router not initialized" error during the first few milliseconds
-		try {
-			replaceState(url, {}); // eslint-disable-line svelte/no-navigation-without-resolve
-			shareUrl = url.href;
-		} catch (_) {
-			// SvelteKit router isn't ready yet; it will catch up on the next state change
-			// Do nothing
-		}
+		charWidth = charMeasureRef.getBoundingClientRect().width;
 	});
 
 	// --- Event Handlers ---
@@ -73,19 +73,29 @@
 	}
 </script>
 
-<div class="grid grid-cols-[2.5rem_1fr] overflow-hidden bg-backdrop light:bg-l-backdrop">
+<!-- This is to measure how much space a character occupies on the screen -->
+<span
+	bind:this={charMeasureRef}
+	class="invisible absolute font-mono whitespace-pre"
+	aria-hidden="true">x</span
+>
+
+<div class="grid grid-cols-[3rem_1fr] overflow-hidden bg-backdrop font-mono light:bg-l-backdrop">
 	<div
 		bind:this={lineNumbersRef}
 		class="overflow-hidden border-r border-separator bg-accent/60 pt-4 pr-3 text-right text-subtext tabular-nums select-none light:border-l-separator light:bg-l-accent/60 light:text-l-subtext"
 	>
-		{#each lines as _, i (i)}
-			<div class="leading-6">{i + 1}</div>
+		{#each lineMetadata as rows, i (i)}
+			<div style="height: {rows * LINE_HEIGHT}rem;" class="leading-6">
+				{i + 1}
+			</div>
 		{/each}
 	</div>
 
 	<textarea
 		bind:this={textareaRef}
 		bind:value={content}
+		bind:clientWidth={containerWidth}
 		id="content"
 		name="content"
 		onscroll={handleScroll}
@@ -93,7 +103,7 @@
 		onkeyup={() => (cursorIndex = textareaRef?.selectionStart ?? 0)}
 		onclick={() => (cursorIndex = textareaRef?.selectionStart ?? 0)}
 		spellcheck="false"
-		class="block-cursor h-full w-full resize-none overflow-x-auto border-none bg-transparent p-0 pt-4 pl-3 leading-6 whitespace-pre text-content caret-content outline-none light:text-l-content light:caret-l-content"
+		class="block-cursor h-full w-full resize-none border-none bg-transparent p-0 pt-4 pl-3 leading-6 break-all whitespace-pre-wrap text-content caret-content outline-none light:text-l-content light:caret-l-content"
 	></textarea>
 	<label for="content" hidden>Content</label>
 </div>
@@ -104,7 +114,6 @@
 	}
 	textarea::-webkit-scrollbar {
 		width: 6px;
-		height: 6px;
 	}
 	textarea::-webkit-scrollbar-thumb {
 		background: #27272a;
