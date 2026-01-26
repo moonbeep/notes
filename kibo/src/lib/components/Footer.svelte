@@ -23,8 +23,9 @@
 				bind:value={fileName}
 				id="fileName"
 				name="fileName"
-				class="field-sizing-content min-w-16 border-none bg-transparent text-gray-500 transition-colors outline-none focus:text-white"
+				class="field-sizing-content min-w-16 border-none bg-transparent text-gray-300 transition-colors outline-none focus:text-gray-100"
 			/>
+			<label for="fileName" hidden>File Name</label>
 			<button
 				class="m-0 rounded px-1 text-gray-100 transition-colors hover:bg-gray-100/40 hover:text-gray-300"
 				use:copy={shareUrl}

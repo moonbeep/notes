@@ -1,2 +1,2 @@
 # notes
-Simple, sharable notes
+Simple, sharable and ephemeral notes

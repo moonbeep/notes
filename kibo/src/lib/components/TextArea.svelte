@@ -97,6 +97,7 @@
 		spellcheck="false"
 		class="block-cursor h-full w-full resize-none border-none bg-transparent p-0 pt-4 pl-3 leading-6 text-gray-100 caret-gray-100 outline-none"
 	></textarea>
+	<label for="content" hidden>Content</label>
 </div>
 
 <style>
