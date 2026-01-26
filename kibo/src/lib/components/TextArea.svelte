@@ -73,10 +73,10 @@
 	}
 </script>
 
-<div class="grid grid-cols-[3.5rem_1fr] overflow-hidden bg-backdrop">
+<div class="grid grid-cols-[2.5rem_1fr] overflow-hidden bg-backdrop light:bg-l-backdrop">
 	<div
 		bind:this={lineNumbersRef}
-		class="overflow-hidden border-r border-separator bg-accent/60 pt-4 pr-3 text-right text-subtext tabular-nums select-none"
+		class="overflow-hidden border-r border-separator bg-accent/60 pt-4 pr-3 text-right text-subtext tabular-nums select-none light:border-l-separator light:bg-l-accent/60 light:text-l-subtext"
 	>
 		{#each lines as _, i (i)}
 			<div class="leading-6">{i + 1}</div>
@@ -93,7 +93,7 @@
 		onkeyup={() => (cursorIndex = textareaRef?.selectionStart ?? 0)}
 		onclick={() => (cursorIndex = textareaRef?.selectionStart ?? 0)}
 		spellcheck="false"
-		class="block-cursor h-full w-full resize-none border-none bg-transparent p-0 pt-4 pl-3 leading-6 text-content caret-content outline-none"
+		class="block-cursor h-full w-full resize-none overflow-x-auto border-none bg-transparent p-0 pt-4 pl-3 leading-6 whitespace-pre text-content caret-content outline-none light:text-l-content light:caret-l-content"
 	></textarea>
 	<label for="content" hidden>Content</label>
 </div>
@@ -104,6 +104,7 @@
 	}
 	textarea::-webkit-scrollbar {
 		width: 6px;
+		height: 6px;
 	}
 	textarea::-webkit-scrollbar-thumb {
 		background: #27272a;

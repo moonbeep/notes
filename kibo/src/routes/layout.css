@@ -1,10 +1,21 @@
 @import 'tailwindcss';
 
 @theme {
+	/*Dark theme: Default*/
 	--color-content: var(--color-gray-100);
 	--color-subtext: var(--color-gray-400);
 
 	--color-separator: var(--color-gray-800);
 	--color-accent: var(--color-gray-900);
 	--color-backdrop: var(--color-black);
+
+	/*Light theme*/
+	--color-l-content: var(--color-gray-950);
+	--color-l-subtext: var(--color-gray-700);
+
+	--color-l-separator: var(--color-violet-800);
+	--color-l-accent: var(--color-violet-200);
+	--color-l-backdrop: var(--color-amber-50);
 }
+
+@custom-variant light (&:where(.light, .light *));
