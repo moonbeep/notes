@@ -5,7 +5,7 @@
 	import Footer from '$lib/components/Footer.svelte';
 
 	let content = $state('');
-	let fileName = $state('hello.txt');
+	let fileName = $state('untitled');
 	let cursorIndex = $state(0);
 	let shareUrl = $state(page.url.href);
 </script>

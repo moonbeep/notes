@@ -7,7 +7,7 @@
 
 	let {
 		content = $bindable(''),
-		fileName = $bindable('hello.txt'),
+		fileName = $bindable('untitled'),
 		cursorIndex = $bindable(0),
 		shareUrl = $bindable(page.url.href)
 	} = $props();
@@ -15,14 +15,12 @@
 	// --- Initial State (SSR Safe) ---
 	// If we are in the browser, pull from URL immediately; otherwise use defaults.
 	content =
-		browser && page.url.searchParams.get('content')
-			? decode(page.url.searchParams.get('content')!)
-			: '';
+		browser && page.url.searchParams.get('c') ? decode(page.url.searchParams.get('c')!) : '';
 
 	fileName =
-		browser && page.url.searchParams.get('file')
-			? decode(page.url.searchParams.get('file')!)
-			: 'hello.txt';
+		browser && page.url.searchParams.get('f')
+			? decode(page.url.searchParams.get('f')!)
+			: 'untitled';
 
 	let textareaRef: HTMLTextAreaElement | undefined = $state();
 	let lineNumbersRef: HTMLDivElement | undefined = $state();
@@ -39,8 +37,8 @@
 		const currentFile = fileName;
 
 		const url = new URL(page.url);
-		url.searchParams.set('file', encode(currentFile));
-		url.searchParams.set('content', encode(currentContent));
+		url.searchParams.set('f', encode(currentFile));
+		url.searchParams.set('c', encode(currentContent));
 
 		// try/catch handles the "router not initialized" error during the first few milliseconds
 		try {
@@ -75,10 +73,10 @@
 	}
 </script>
 
-<div class="grid grid-cols-[3.5rem_1fr] overflow-hidden bg-black">
+<div class="grid grid-cols-[3.5rem_1fr] overflow-hidden bg-backdrop">
 	<div
 		bind:this={lineNumbersRef}
-		class="overflow-hidden border-r border-gray-800 bg-gray-900/60 pt-4 pr-3 text-right text-gray-500 tabular-nums select-none"
+		class="overflow-hidden border-r border-separator bg-accent/60 pt-4 pr-3 text-right text-subtext tabular-nums select-none"
 	>
 		{#each lines as _, i (i)}
 			<div class="leading-6">{i + 1}</div>
@@ -95,7 +93,7 @@
 		onkeyup={() => (cursorIndex = textareaRef?.selectionStart ?? 0)}
 		onclick={() => (cursorIndex = textareaRef?.selectionStart ?? 0)}
 		spellcheck="false"
-		class="block-cursor h-full w-full resize-none border-none bg-transparent p-0 pt-4 pl-3 leading-6 text-gray-100 caret-gray-100 outline-none"
+		class="block-cursor h-full w-full resize-none border-none bg-transparent p-0 pt-4 pl-3 leading-6 text-content caret-content outline-none"
 	></textarea>
 	<label for="content" hidden>Content</label>
 </div>
