@@ -8,8 +8,7 @@
 
 	import { encode } from '$lib/utils/base64';
 
-	const FILENAME_LIMIT = 256;
-	const CONTENT_LIMIT = 11008;
+	import { FILENAME_LIMIT, CONTENT_LIMIT } from '$lib/constants';
 
 	let { fileName = $bindable('untitled'), content = '', cursorIndex = 0 } = $props();
 

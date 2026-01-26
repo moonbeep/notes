@@ -4,6 +4,8 @@
 
 	import { decode } from '$lib/utils/base64';
 
+	import { LINE_HEIGHT } from '$lib/constants';
+
 	let {
 		content = $bindable(''),
 		fileName = $bindable('untitled'),
@@ -26,7 +28,6 @@
 
 	let containerWidth = $state(0);
 	let charWidth = $state(0);
-	const LINE_HEIGHT = 1.5; // Matches leading-6 (1.5rem = 24px)
 
 	// --- Derived Calculations ---
 	let lines = $derived(content.split('\n'));
