@@ -3,8 +3,7 @@
 	import { replaceState } from '$app/navigation';
 	import { browser } from '$app/environment';
 
-	import { decode } from '$lib/utils/base64';
-	import { getUrl } from '$lib/utils/url';
+	import { decode, getUrl } from '$lib/utils/url';
 
 	import { LINE_HEIGHT, CONTENT_LIMIT } from '$lib/constants';
 
