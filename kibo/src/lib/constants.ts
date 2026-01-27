@@ -7,5 +7,5 @@ export const BANNER = `
 ╚═╝  ╚═╝ ╚═╝ ╚═════╝  ╚═════╝     ╚═╝  ╚═══╝ ╚═════╝    ╚═╝   ╚══════╝╚══════╝
                                                                             `; // Font: ANSI Shadow
 export const FILENAME_LIMIT = 256;
-export const CONTENT_LIMIT = 14336;
+export const CONTENT_LIMIT = 16384;
 export const LINE_HEIGHT = 1.5;

@@ -3,22 +3,22 @@
 	import { replaceState } from '$app/navigation';
 
 	import { copyToClipboard } from '$lib/utils/clipboard';
-	import { getUrl } from '$lib/utils/url';
+	import { encodeUrl } from '$lib/utils/url';
 
 	import Button from '$lib/components/Button.svelte';
 	import { ThemeManager } from '$lib/components/Theme.svelte';
 
 	import { FILENAME_LIMIT } from '$lib/constants';
 
-	let { fileName = $bindable('untitled'), content = '', cursorIndex = 0 } = $props();
+	let { fileName = $bindable('new'), content = '', cursorIndex = 0 } = $props();
 
 	let cursorRow = $derived(content.slice(0, cursorIndex).split('\n').length);
 	let cursorCol = $derived(cursorIndex - content.lastIndexOf('\n', cursorIndex - 1));
 
 	let shareText = $state('Share');
 
-	const shareNote = () => {
-		const url = getUrl(page.url.href, fileName, content);
+	const shareNote = async () => {
+		const url = await encodeUrl(page.url.href, fileName, content);
 
 		try {
 			replaceState(url, {}); // eslint-disable-line svelte/no-navigation-without-resolve

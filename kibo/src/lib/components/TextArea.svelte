@@ -1,27 +1,17 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { replaceState } from '$app/navigation';
-	import { browser } from '$app/environment';
+	import { onMount } from 'svelte';
 
-	import { decode, getUrl } from '$lib/utils/url';
+	import { decodeUrl, encodeUrl } from '$lib/utils/url';
 
 	import { LINE_HEIGHT, CONTENT_LIMIT } from '$lib/constants';
 
 	let {
 		content = $bindable(''),
-		fileName = $bindable('untitled'),
+		fileName = $bindable('new'),
 		cursorIndex = $bindable(0)
 	} = $props();
-
-	// --- Initial State (SSR Safe) ---
-	// If we are in the browser, pull from URL immediately; otherwise use defaults.
-	content =
-		browser && page.url.searchParams.get('c') ? decode(page.url.searchParams.get('c')!) : '';
-
-	fileName =
-		browser && page.url.searchParams.get('f')
-			? decode(page.url.searchParams.get('f')!)
-			: 'untitled';
 
 	let textareaRef: HTMLTextAreaElement | undefined = $state();
 	let lineNumbersRef: HTMLDivElement | undefined = $state();
@@ -46,6 +36,12 @@
 	});
 
 	// --- Sync Effects ---
+	onMount(async () => {
+		const params = await decodeUrl(page.url.href);
+		content = params.content;
+		fileName = params.fileName;
+	});
+
 	$effect(() => {
 		if (!charMeasureRef) return;
 
@@ -102,8 +98,8 @@
 		name="content"
 		onscroll={handleScroll}
 		onkeydown={handleKeydown}
-		onkeyup={() => {
-			const url = getUrl(page.url.href, fileName, content);
+		onkeyup={async () => {
+			const url = await encodeUrl(page.url.href, fileName, content);
 
 			try {
 				replaceState(url, {}); // eslint-disable-line svelte/no-navigation-without-resolve

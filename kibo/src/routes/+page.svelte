@@ -6,7 +6,7 @@
 	import { BANNER } from '$lib/constants';
 
 	let content = $state('');
-	let fileName = $state('untitled');
+	let fileName = $state('new');
 	let cursorIndex = $state(0);
 
 	$effect(() => {
