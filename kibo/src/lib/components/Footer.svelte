@@ -3,12 +3,12 @@
 	import { replaceState } from '$app/navigation';
 
 	import { copyToClipboard } from '$lib/utils/clipboard';
+	import { getUrl } from '$lib/utils/url';
+
 	import Button from '$lib/components/Button.svelte';
-	import { ThemeManager } from './Theme.svelte';
+	import { ThemeManager } from '$lib/components/Theme.svelte';
 
-	import { encode } from '$lib/utils/base64';
-
-	import { FILENAME_LIMIT, CONTENT_LIMIT } from '$lib/constants';
+	import { FILENAME_LIMIT } from '$lib/constants';
 
 	let { fileName = $bindable('untitled'), content = '', cursorIndex = 0 } = $props();
 
@@ -18,9 +18,7 @@
 	let shareText = $state('Share');
 
 	const shareNote = () => {
-		const url = new URL(page.url);
-		url.searchParams.set('f', encode(fileName.slice(0, FILENAME_LIMIT)));
-		url.searchParams.set('c', encode(content.slice(0, CONTENT_LIMIT)));
+		const url = getUrl(page.url.href, fileName, content);
 
 		try {
 			replaceState(url, {}); // eslint-disable-line svelte/no-navigation-without-resolve
@@ -46,6 +44,7 @@
 				bind:value={fileName}
 				id="fileName"
 				name="fileName"
+				maxlength={FILENAME_LIMIT}
 				class="field-sizing-content max-w-32 min-w-8 border-none bg-transparent text-subtext transition-colors outline-none focus:text-content light:text-l-subtext light:focus:text-l-content"
 			/>
 			<label for="fileName" class="hidden">File Name</label>

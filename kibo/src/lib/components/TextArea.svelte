@@ -1,10 +1,12 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import { replaceState } from '$app/navigation';
 	import { browser } from '$app/environment';
 
 	import { decode } from '$lib/utils/base64';
+	import { getUrl } from '$lib/utils/url';
 
-	import { LINE_HEIGHT } from '$lib/constants';
+	import { LINE_HEIGHT, CONTENT_LIMIT } from '$lib/constants';
 
 	let {
 		content = $bindable(''),
@@ -101,9 +103,20 @@
 		name="content"
 		onscroll={handleScroll}
 		onkeydown={handleKeydown}
-		onkeyup={() => (cursorIndex = textareaRef?.selectionStart ?? 0)}
+		onkeyup={() => {
+			const url = getUrl(page.url.href, fileName, content);
+
+			try {
+				replaceState(url, {}); // eslint-disable-line svelte/no-navigation-without-resolve
+			} catch (_) {
+				// SvelteKit router isn't ready yet; it will catch up on the next state change
+				// Do nothing
+			}
+			cursorIndex = textareaRef?.selectionStart ?? 0;
+		}}
 		onclick={() => (cursorIndex = textareaRef?.selectionStart ?? 0)}
 		spellcheck="false"
+		maxlength={CONTENT_LIMIT}
 		class="block-cursor h-full w-full resize-none border-none bg-transparent p-0 pt-4 pl-3 leading-6 break-all whitespace-pre-wrap text-content caret-content outline-none light:text-l-content light:caret-l-content"
 	></textarea>
 	<label for="content" hidden>Content</label>
