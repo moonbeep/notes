@@ -43,9 +43,27 @@
 	});
 
 	$effect(() => {
+		// Touching content and fileName so Svelte can track it in effect
+		const currentContent = content;
+		const currentFileName = fileName;
+
 		if (!charMeasureRef) return;
 
 		charWidth = charMeasureRef.getBoundingClientRect().width;
+
+		const timerId = setTimeout(async () => {
+			const url = await encodeUrl(page.url.href, currentFileName, currentContent);
+			try {
+				replaceState(url, {}); // eslint-disable-line svelte/no-navigation-without-resolve
+			} catch (_) {
+				// SvelteKit router isn't ready yet; it will catch up on the next state change
+				// Do nothing
+			}
+		}, 300);
+
+		return () => {
+			clearTimeout(timerId);
+		};
 	});
 
 	// --- Event Handlers ---
@@ -98,17 +116,7 @@
 		name="content"
 		onscroll={handleScroll}
 		onkeydown={handleKeydown}
-		onkeyup={async () => {
-			const url = await encodeUrl(page.url.href, fileName, content);
-
-			try {
-				replaceState(url, {}); // eslint-disable-line svelte/no-navigation-without-resolve
-			} catch (_) {
-				// SvelteKit router isn't ready yet; it will catch up on the next state change
-				// Do nothing
-			}
-			cursorIndex = textareaRef?.selectionStart ?? 0;
-		}}
+		onkeyup={async () => (cursorIndex = textareaRef?.selectionStart ?? 0)}
 		onclick={() => (cursorIndex = textareaRef?.selectionStart ?? 0)}
 		spellcheck="false"
 		maxlength={CONTENT_LIMIT}
