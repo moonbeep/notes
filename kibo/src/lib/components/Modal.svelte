@@ -77,7 +77,7 @@
 				aria-label="search note"
 				bind:value={searchText}
 				placeholder="Search notes..."
-				class="w-full rounded border border-separator p-1 text-content
+				class="w-full rounded border border-separator p-2 text-content
 				focus:ring-1 focus:ring-accent/50 focus:outline-none
 				light:border-l-separator light:text-l-content light:focus:ring-l-accent/50"
 			/>
@@ -85,20 +85,23 @@
 			<!-- Notes list -->
 			<ul class="max-h-64 overflow-y-auto">
 				{#each filteredNoteNames as name (name)}
-					<li transition:slide={{ duration: 100 }} class="grid grid-cols-[1fr_auto] gap-4">
+					<li
+						transition:slide={{ duration: 100 }}
+						class="grid grid-cols-[1fr_auto] gap-4 border-b border-separator py-1 light:border-l-separator"
+					>
 						<!-- Load button -->
 						<Button onclick={() => onLoadNote(name)}>
-							[{name}]
+							<div class="p-1">{name}</div>
 						</Button>
 						<!-- Delete button -->
 						<Button onclick={() => onDeleteNote(name)}
-							><spam class="text-danger light:text-l-danger">[X]</spam></Button
+							><div class="p-1 text-danger light:text-l-danger">[X]</div></Button
 						>
 					</li>
 				{/each}
 			</ul>
 
-			<div class="p-4">
+			<div class="p-2">
 				<Button label="close modal" onclick={onClose}>[Close]</Button>
 			</div>
 		</div>
