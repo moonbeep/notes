@@ -47,7 +47,6 @@
 		}
 		await deleteNote(deleteNoteName);
 		savedNotes = await listNotes();
-		isOpen = false;
 	};
 
 	onClose = (event: MouseEvent) => {

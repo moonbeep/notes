@@ -67,6 +67,15 @@
 	});
 </script>
 
+<svelte:window
+	onkeydown={(e) => {
+		if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+			e.preventDefault();
+			onSaveNote();
+		}
+	}}
+/>
+
 <div class=" bg-backdrop light:bg-l-backdrop">
 	<div
 		class="grid min-h-6 grid-cols-[1fr_auto] items-center border-t border-separator bg-accent/60 px-2 select-none light:border-l-separator light:bg-l-accent/60"
