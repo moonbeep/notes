@@ -7,10 +7,12 @@
 
 	--color-separator: var(--color-gray-800);
 	--color-accent: var(--color-gray-900);
+	--color-danger: var(--color-red-400);
 	--color-backdrop: var(--color-black);
 
 	/*Light theme*/
 	--color-l-content: var(--color-gray-950);
+	--color-l-danger: var(--color-red-400);
 	--color-l-subtext: var(--color-gray-700);
 
 	--color-l-separator: var(--color-violet-800);

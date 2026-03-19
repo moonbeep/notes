@@ -3,14 +3,16 @@
 	import { replaceState } from '$app/navigation';
 	import { onMount } from 'svelte';
 
+	import { saveNote } from '$lib/utils/db';
 	import { decodeUrl, encodeUrl } from '$lib/utils/url';
 
 	import { LINE_HEIGHT, CONTENT_LIMIT } from '$lib/constants';
 
 	let {
 		content = $bindable(''),
-		fileName = $bindable('new'),
-		cursorIndex = $bindable(0)
+		noteName = $bindable('new'),
+		cursorIndex = $bindable(0),
+		autosave = false
 	} = $props();
 
 	let textareaRef: HTMLTextAreaElement | undefined = $state();
@@ -39,13 +41,13 @@
 	onMount(async () => {
 		const params = await decodeUrl(page.url.href);
 		content = params.content;
-		fileName = params.fileName;
+		noteName = params.noteName;
 	});
 
 	$effect(() => {
-		// Touching content and fileName so Svelte can track it in effect
+		// Touching content and noteName so Svelte can track it in effect
 		const currentContent = content;
-		const currentFileName = fileName;
+		const currentFileName = noteName;
 
 		if (!charMeasureRef) return;
 
@@ -58,6 +60,9 @@
 			} catch (_) {
 				// SvelteKit router isn't ready yet; it will catch up on the next state change
 				// Do nothing
+			}
+			if (autosave) {
+				await saveNote(content, noteName);
 			}
 		}, 300);
 

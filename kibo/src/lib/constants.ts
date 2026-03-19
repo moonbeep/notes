@@ -6,6 +6,10 @@ export const BANNER = `
 ██║  ██╗ ██║ ██████╔╝╚██████╔╝    ██║ ╚████║╚██████╔╝   ██║   ███████╗███████║
 ╚═╝  ╚═╝ ╚═╝ ╚═════╝  ╚═════╝     ╚═╝  ╚═══╝ ╚═════╝    ╚═╝   ╚══════╝╚══════╝
 `; // Font: ANSI Shadow
-export const FILENAME_LIMIT = 256;
+export const NOTE_NAME_LIMIT = 256;
 export const CONTENT_LIMIT = 16384;
 export const LINE_HEIGHT = 1.5;
+
+// Database
+export const DB_NAME = 'kibo-notes';
+export const STORE_NAME = 'notes-store';
