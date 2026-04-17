@@ -86,7 +86,7 @@
 				{#each filteredNoteNames as name (name)}
 					<li
 						transition:slide={{ duration: 100 }}
-						class="grid grid-cols-[1fr_auto] gap-4 border-b border-separator py-1 light:border-l-separator"
+						class="grid grid-cols-[1fr_auto] gap-1 border-b border-separator py-1 light:border-l-separator"
 					>
 						<!-- Load button -->
 						<Button onclick={() => onLoadNote(name)}>
@@ -94,7 +94,7 @@
 						</Button>
 						<!-- Delete button -->
 						<Button onclick={() => onDeleteNote(name)}
-							><div class="p-1 text-danger light:text-l-danger">[X]</div></Button
+							><div class="p-1 text-danger light:text-l-danger">[#]</div></Button
 						>
 					</li>
 				{/each}

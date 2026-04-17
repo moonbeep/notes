@@ -1,6 +1,6 @@
 import { SvelteURL } from 'svelte/reactivity';
 
-import { NOTE_NAME_LIMIT, CONTENT_LIMIT } from '$lib/constants';
+import { NOTE_NAME_LIMIT, CONTENT_LIMIT, URL_LIMIT } from '$lib/constants';
 
 export async function compress(str: string): Promise<string> {
 	const blob = new Blob([str]);
@@ -30,12 +30,22 @@ export async function decompress(base64: string): Promise<string> {
 export const encodeUrl = async (
 	href: string,
 	noteName: string,
-	content: string
-): Promise<SvelteURL> => {
+	content: string,
+	overflow: boolean = false
+): Promise<{ url: SvelteURL; overflow: boolean }> => {
 	const url = new SvelteURL(href);
 	url.searchParams.set('f', await compress(noteName.slice(0, NOTE_NAME_LIMIT)));
 	url.searchParams.set('c', await compress(content.slice(0, CONTENT_LIMIT)));
-	return url;
+
+	if (url.href.length > URL_LIMIT) {
+		return await encodeUrl(
+			href,
+			noteName,
+			content.slice(0, Math.floor((URL_LIMIT / url.href.length) * content.length)),
+			true
+		);
+	}
+	return { url: url, overflow: overflow };
 };
 
 export const decodeUrl = async (href: string) => {

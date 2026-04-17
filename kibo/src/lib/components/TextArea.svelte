@@ -12,7 +12,8 @@
 		content = $bindable(''),
 		noteName = $bindable('new'),
 		cursorIndex = $bindable(0),
-		autosave = false
+		autosave = false,
+		overflow = $bindable(false)
 	} = $props();
 
 	let textareaRef: HTMLTextAreaElement | undefined = $state();
@@ -54,15 +55,18 @@
 		charWidth = charMeasureRef.getBoundingClientRect().width;
 
 		const timerId = setTimeout(async () => {
-			const url = await encodeUrl(page.url.href, currentFileName, currentContent);
+			const encoded = await encodeUrl(page.url.href, currentFileName, currentContent);
 			try {
-				replaceState(url, {}); // eslint-disable-line svelte/no-navigation-without-resolve
+				replaceState(encoded.url, {}); // eslint-disable-line svelte/no-navigation-without-resolve
 			} catch (_) {
 				// SvelteKit router isn't ready yet; it will catch up on the next state change
 				// Do nothing
 			}
 			if (autosave) {
 				await saveNote(content, noteName);
+			}
+			if (encoded.overflow === true) {
+				overflow = true;
 			}
 		}, 300);
 
@@ -114,6 +118,7 @@
 	</div>
 
 	<textarea
+		aria-label="note"
 		bind:this={textareaRef}
 		bind:value={content}
 		bind:clientWidth={containerWidth}

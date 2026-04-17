@@ -12,6 +12,7 @@
 	let isOpen = $state(false);
 	let savedNotes = $state([]);
 	let autosave = $state(false);
+	let overflow = $state(false);
 
 	$effect(() => {
 		ThemeManager.apply();
@@ -21,7 +22,7 @@
 </script>
 
 <main class="text-md grid h-screen grid-rows-[1fr_auto] overflow-hidden font-mono text-sm">
-	<TextArea bind:content bind:noteName bind:cursorIndex {autosave} />
+	<TextArea bind:content bind:noteName bind:cursorIndex {autosave} bind:overflow />
 	<Footer
 		bind:noteName
 		{content}
@@ -29,6 +30,7 @@
 		bind:isLoadModalOpen={isOpen}
 		bind:savedNotes
 		bind:autosave
+		{overflow}
 	/>
 	<Modal bind:isOpen bind:selectedNoteName={noteName} bind:content bind:savedNotes bind:autosave />
 </main>
