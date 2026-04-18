@@ -4,9 +4,10 @@
 	import { onMount } from 'svelte';
 
 	import { saveNote } from '$lib/utils/db';
-	import { decodeUrl, encodeUrl } from '$lib/utils/url';
+	import { decodeUrl, encodeUrl, trim } from '$lib/utils/url';
+	import { toggleTodo, setLineSeparator } from '$lib/utils/hotkeys';
 
-	import { LINE_HEIGHT, CONTENT_LIMIT } from '$lib/constants';
+	import { LINE_HEIGHT, CONTENT_LIMIT, URL_LIMIT, HOTKEYS } from '$lib/constants';
 
 	let {
 		content = $bindable(''),
@@ -14,7 +15,13 @@
 		cursorIndex = $bindable(0),
 		autosave = false,
 		overflow = $bindable(false)
-	} = $props();
+	} = $props<{
+		content: string;
+		noteName: string;
+		cursorIndex: number;
+		autosave: boolean;
+		overflow: boolean;
+	}>();
 
 	let textareaRef: HTMLTextAreaElement | undefined = $state();
 	let lineNumbersRef: HTMLDivElement | undefined = $state();
@@ -32,7 +39,7 @@
 
 		const charsPerLine = Math.floor(containerWidth / charWidth);
 
-		return lines.map((line) => {
+		return lines.map((line: string) => {
 			if (line.length === 0) return 1;
 			return Math.ceil(line.length / charsPerLine) || 1;
 		});
@@ -55,18 +62,21 @@
 		charWidth = charMeasureRef.getBoundingClientRect().width;
 
 		const timerId = setTimeout(async () => {
-			const encoded = await encodeUrl(page.url.href, currentFileName, currentContent);
+			const url = await encodeUrl(page.url.href, currentFileName, currentContent);
+			if (url.href.length > URL_LIMIT) {
+				overflow = true;
+				setTimeout(() => (overflow = false), 5000);
+				content = await trim(page.url.href, currentFileName, currentContent);
+				return;
+			}
 			try {
-				replaceState(encoded.url, {}); // eslint-disable-line svelte/no-navigation-without-resolve
+				replaceState(url, {}); // eslint-disable-line svelte/no-navigation-without-resolve
 			} catch (_) {
 				// SvelteKit router isn't ready yet; it will catch up on the next state change
 				// Do nothing
 			}
 			if (autosave) {
 				await saveNote(content, noteName);
-			}
-			if (encoded.overflow === true) {
-				overflow = true;
 			}
 		}, 300);
 
@@ -81,17 +91,43 @@
 	}
 
 	function handleKeydown(e: KeyboardEvent) {
+		let newCursorPos: number | null = null;
+
 		if (e.key === 'Tab') {
 			e.preventDefault();
 			const start = textareaRef!.selectionStart;
 			const end = textareaRef!.selectionEnd;
 			content = content.substring(0, start) + '  ' + content.substring(end);
 
+			newCursorPos = start + 2;
+		}
+
+		if ((e.metaKey || e.ctrlKey) && (e.key === HOTKEYS.TodoDone || e.key === HOTKEYS.TodoNotDone)) {
+			e.preventDefault();
+			const start = textareaRef!.selectionStart;
+			const end = textareaRef!.selectionEnd;
+			content = content.substring(0, start) + content.substring(end);
+			const marker = e.key === HOTKEYS.TodoNotDone ? '[ ] ' : '[#] ';
+			const result = toggleTodo(content, start, marker);
+			content = result.content;
+
+			newCursorPos = result.cursorPos;
+		}
+
+		if ((e.metaKey || e.ctrlKey) && e.key === HOTKEYS.LineSeparator) {
+			e.preventDefault();
+			const start = textareaRef!.selectionStart;
+			const result = setLineSeparator(content, start);
+			content = result.content;
+
+			newCursorPos = result.cursorPos;
+		}
+
+		if (newCursorPos !== null) {
 			// Update cursor position after DOM updates
 			requestAnimationFrame(() => {
 				if (textareaRef) {
-					textareaRef.selectionStart = textareaRef.selectionEnd = start + 2;
-					cursorIndex = textareaRef.selectionStart;
+					textareaRef.selectionStart = textareaRef.selectionEnd = cursorIndex = newCursorPos!;
 				}
 			});
 		}

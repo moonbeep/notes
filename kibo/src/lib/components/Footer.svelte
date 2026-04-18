@@ -36,16 +36,16 @@
 	let saveText = $derived(autosave === true ? 'Auto Saving' : 'Save');
 
 	const shareNote = async () => {
-		const encoded = await encodeUrl(page.url.href, noteName, content);
+		const url = await encodeUrl(page.url.href, noteName, content);
 
 		try {
-			replaceState(encoded.url, {}); // eslint-disable-line svelte/no-navigation-without-resolve
+			replaceState(url, {}); // eslint-disable-line svelte/no-navigation-without-resolve
 		} catch (_) {
 			// SvelteKit router isn't ready yet; it will catch up on the next state change
 			// Do nothing
 		}
 
-		copyToClipboard(encoded.url.href);
+		copyToClipboard(url.href);
 		shareText = 'Copied!';
 		setTimeout(() => {
 			shareText = 'Share';

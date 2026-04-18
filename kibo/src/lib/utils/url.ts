@@ -30,22 +30,12 @@ export async function decompress(base64: string): Promise<string> {
 export const encodeUrl = async (
 	href: string,
 	noteName: string,
-	content: string,
-	overflow: boolean = false
-): Promise<{ url: SvelteURL; overflow: boolean }> => {
+	content: string
+): Promise<SvelteURL> => {
 	const url = new SvelteURL(href);
 	url.searchParams.set('f', await compress(noteName.slice(0, NOTE_NAME_LIMIT)));
 	url.searchParams.set('c', await compress(content.slice(0, CONTENT_LIMIT)));
-
-	if (url.href.length > URL_LIMIT) {
-		return await encodeUrl(
-			href,
-			noteName,
-			content.slice(0, Math.floor((URL_LIMIT / url.href.length) * content.length)),
-			true
-		);
-	}
-	return { url: url, overflow: overflow };
+	return url;
 };
 
 export const decodeUrl = async (href: string) => {
@@ -58,4 +48,22 @@ export const decodeUrl = async (href: string) => {
 		content: content,
 		noteName: noteName
 	};
+};
+
+export const trim = async (href: string, noteName: string, content: string): Promise<string> => {
+	// Binary search for the largest content length that keeps the URL under URL_LIMIT
+	let lo = 0;
+	let hi = content.length;
+
+	while (lo < hi) {
+		const mid = Math.ceil((lo + hi) / 2);
+		const url = await encodeUrl(href, noteName, content.slice(0, mid));
+		if (url.href.length <= URL_LIMIT) {
+			lo = mid;
+		} else {
+			hi = mid - 1;
+		}
+	}
+
+	return content.slice(0, lo);
 };

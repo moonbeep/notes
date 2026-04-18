@@ -14,3 +14,12 @@ export const LINE_HEIGHT = 1.5;
 // Database
 export const DB_NAME = 'kibo-notes';
 export const STORE_NAME = 'notes-store';
+
+// Hotkeys
+export const HOTKEYS = {
+	TodoNotDone: '[',
+	TodoDone: ']',
+	LineSeparator: '\\'
+};
+export const MARKER_REGEX = /^\[.*?\] */;
+export const SEPARATOR_LENGTH = 60;

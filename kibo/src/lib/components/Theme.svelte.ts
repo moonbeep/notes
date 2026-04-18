@@ -18,7 +18,7 @@ const getInitialTheme = (): Theme => {
 	return getSystemTheme();
 };
 
-let theme = $state<Theme>(getInitialTheme());
+let theme: Theme = $state<Theme>(getInitialTheme());
 
 export const ThemeManager = {
 	get current(): string {
